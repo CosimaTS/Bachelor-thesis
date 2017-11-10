@@ -1,0 +1,81 @@
+# import necessary libraries
+import json
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from matplotlib import pyplot as plt
+from time import time
+from sklearn.datasets import make_moons
+from sklearn.utils import shuffle
+from sklearn.preprocessing import Binarizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import load_svmlight_files
+from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import roc_curve
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.feature_extraction.text import TfidfTransformer
+
+def load_files(files):
+    return load_svmlight_files(files, n_features=None, dtype=None)
+
+# Calculating Tf-Idf for training and testing = a statistical measure used to evaluate how important a word is in a document
+def tfidf(X_train, X_test):
+    tf_transformer = TfidfTransformer()
+# computes the TF for each review, the IDF using each review
+# finally the TF-IDF for each review
+    X_train_tfidf = tf_transformer.fit_transform(X_train)
+    print(X_train_tfidf.shape)
+# transforms on the testing data which computes the TF for each review,
+# then the TF-IDF for each review using the IDF from the training data
+    X_test_tfidf = tf_transformer.transform(X_test)
+    print(X_test_tfidf.shape)
+    return [X_train_tfidf,X_test_tfidf]
+
+# Train and test Logistic Regression Classifier
+def log_reg_clf(X_train, y_train, X_test, y_test):
+    start = time()
+    logreg = LogisticRegression()
+    
+    print("Training ...")
+    logreg.fit(X_train, y_train)
+    print("Training Done")
+
+    print("Testing ...")
+    logreg_accuracy = logreg.score(X_test, y_test) * 100
+    print("Testing Done")
+    end = time()
+    return [logreg, round(logreg_accuracy,2), str(round((end-start), 2))]
+
+# Store predictions in CSV file
+def save_csv( prediction_result, fileName, labels):
+    print("Creating CSV file")
+# Open File
+    output_file = open(fileName+".csv",'w')
+    output_file.write(','.join(labels)+"\n")
+# Write data to file
+    for r in prediction_result:
+        output_file.write(r + "\n")
+        output_file.close()
+        print("File saved!")
+
+X_train, y_train, X_test, y_test = load_files(["/Users/cosimaklenner/PycharmProjects/logReg/aclImdb/train/labeledBow.feat","/Users/cosimaklenner/PycharmProjects/logReg/aclImdb/test/labeledBow.feat"]])
+
+X_train.shape
+X_test.shape
+y_test.shape
+y_train.shape
+type(X_train)
+
+X_train, X_test = tfidf(X_train, X_test)
+
+print("Binarizing target ...")
+# Binarize target data (positive / negative)
+y_train[y_train<=5] = 0 #negative 
+y_train[y_train>5] = 1 #positive
+
+y_test[y_test<=5] = 0 #negative
+y_test[y_test>5] = 1 #positive
+
+model_fct = log_reg_clf(X_train, y_train, X_test, y_test)
+logreg_accuracy = model_fct[1] 
+logreg_time = model_fct[2] 
