@@ -5,16 +5,16 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 from time import time
-from sklearn.datasets import make_moons
 from sklearn.utils import shuffle
-from sklearn.preprocessing import Binarizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.datasets import load_svmlight_files
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import roc_curve
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.feature_extraction.text import TfidfTransformer
+from keras.datasets import imdb
 
+# Prepare data set loading
 def load_files(files):
     return load_svmlight_files(files, n_features=None, dtype=None)
 
