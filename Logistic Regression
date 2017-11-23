@@ -1,81 +1,109 @@
-# import necessary libraries
-import json
-import numpy as np
-import pandas as pd
-import seaborn as sns
-from matplotlib import pyplot as plt
+# Import necessary libraries
+import numpy
 from time import time
-from sklearn.utils import shuffle
 from sklearn.linear_model import LogisticRegression
-from sklearn.datasets import load_svmlight_files
-from sklearn.model_selection import cross_val_predict
-from sklearn.metrics import roc_curve
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from keras.datasets import imdb
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import brier_score_loss, roc_auc_score
 
-# Prepare data set loading
-def load_files(files):
-    return load_svmlight_files(files, n_features=None, dtype=None)
-
-# Calculating Tf-Idf for training and testing = a statistical measure used to evaluate how important a word is in a document
+# Calculate the Tf-Idf for training and testing 
 def tfidf(X_train, X_test):
-    tf_transformer = TfidfTransformer()
-# computes the TF for each review, the IDF using each review
-# finally the TF-IDF for each review
+    tf_transformer = TfidfVectorizer()
     X_train_tfidf = tf_transformer.fit_transform(X_train)
-    print(X_train_tfidf.shape)
-# transforms on the testing data which computes the TF for each review,
-# then the TF-IDF for each review using the IDF from the training data
     X_test_tfidf = tf_transformer.transform(X_test)
-    print(X_test_tfidf.shape)
-    return [X_train_tfidf,X_test_tfidf]
+    return [X_train_tfidf, X_test_tfidf]
 
-# Train and test Logistic Regression Classifier
+# Create the model: Logistic Regression Classifier
 def log_reg_clf(X_train, y_train, X_test, y_test):
+    Cs = numpy.array([0.1, 1.0, 5.0, 10.0])
     start = time()
-    logreg = LogisticRegression()
+    logreg = LogisticRegression() #C parameter: regularization (prevents overfitting)
     
+    #Parameter tuning: 3-fold cross-validation (cv=none)
+    grid = GridSearchCV(estimator=logreg, param_grid=dict(C=Cs))
+    grid.fit(X_train, y_train)
+    print(grid)
+    print(grid.best_score_) #66% von 80% trainiert, 33% von 80% validiert 
+    print(grid.best_estimator_.C)
+    
+    # Train and test the model
     print("Training ...")
+    logreg = LogisticRegression(C=grid.best_estimator_.C) #80% trainiert, 20% trainiert
     logreg.fit(X_train, y_train)
-    print("Training Done")
+    print("Training done!")
 
     print("Testing ...")
     logreg_accuracy = logreg.score(X_test, y_test) * 100
-    print("Testing Done")
+    predictions = logreg.predict_proba(X_test)[:,1]
+    print(predictions)
+    logreg_brierscore = brier_score_loss(y_test, predictions)
+    logreg_rocauc = roc_auc_score(y_test, predictions)
+    print("Testing done!")
     end = time()
-    return [logreg, round(logreg_accuracy,2), str(round((end-start), 2))]
+    return [logreg, round(logreg_accuracy, 2), logreg_brierscore, logreg_rocauc, str(round((end - start), 2))]
 
-# Store predictions in CSV file
-def save_csv( prediction_result, fileName, labels):
-    print("Creating CSV file")
-# Open File
-    output_file = open(fileName+".csv",'w')
-    output_file.write(','.join(labels)+"\n")
-# Write data to file
-    for r in prediction_result:
-        output_file.write(r + "\n")
-        output_file.close()
-        print("File saved!")
+# Load the data set
+print("Loading data set ...")
+(X_train, y_train), (X_test, y_test) = imdb.load_data()
+print("Data set loaded!")
 
-X_train, y_train, X_test, y_test = load_files(["/Users/cosimaklenner/PycharmProjects/logReg/aclImdb/train/labeledBow.feat","/Users/cosimaklenner/PycharmProjects/logReg/aclImdb/test/labeledBow.feat"]])
+X = numpy.concatenate((X_train, X_test), axis=0)
+y = numpy.concatenate((y_train, y_test), axis=0)
 
-X_train.shape
-X_test.shape
-y_test.shape
-y_train.shape
-type(X_train)
+# Split data set: 60% Training, 20% Validation, 20% Testing 
+X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                    test_size=0.2, 
+                                                    random_state=1)
+
+#X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, 
+                                                   #test_size=0.25, 
+                                                   #random_state=1)
+print("Size of Training data: ")
+print(X_train.shape)
+print("Size of Testing data: ")
+print(X_test.shape)
+#print(X_val.shape)
+
+# Create an index
+print("Creating the index ...")
+word_to_index = imdb.get_word_index()
+index_to_word = [None] * (max(word_to_index.values()) + 1)
+for w, i in word_to_index.items():
+    index_to_word[i] = w
+print("Index done!")
+
+# Reconstruct reviews: using the above built index
+X_train = [
+    ' '.join(
+        index_to_word[i]
+        for i in X_train[i]
+        if i < len(index_to_word)
+    ) for i in range(X_train.shape[0])
+]
+
+X_test = [
+    ' '.join(
+        index_to_word[i]
+        for i in X_test[i]
+        if i < len(index_to_word)
+    ) for i in range(X_test.shape[0])
+]
 
 X_train, X_test = tfidf(X_train, X_test)
 
-print("Binarizing target ...")
-# Binarize target data (positive / negative)
-y_train[y_train<=5] = 0 #negative 
-y_train[y_train>5] = 1 #positive
-
-y_test[y_test<=5] = 0 #negative
-y_test[y_test>5] = 1 #positive
-
+# Run & evaluate the model 
 model_fct = log_reg_clf(X_train, y_train, X_test, y_test)
-logreg_accuracy = model_fct[1] 
-logreg_time = model_fct[2] 
+logreg_accuracy = model_fct[1]
+logreg_brierscore = model_fct[2]
+logreg_rocauc = model_fct[3]
+logreg_time = model_fct[4]
+
+print("Accuracy is: ")
+print(logreg_accuracy)
+print("Brier score: ")
+print(logreg_brierscore)
+print("AUC score: ")
+print(logreg_rocauc)
+print("Time used to train and test: ")
+print(logreg_time)
