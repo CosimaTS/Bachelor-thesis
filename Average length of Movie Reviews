@@ -1,13 +1,14 @@
+# Install libraries 
 install numpy
 from keras.datasets import imdb
 from matplotlib import pyplot
 
-#load data set
+# Load the data set
 (X_train, y_train), (X_test, y_test) = imdb.load_data()
 X = numpy.concatenate((X_train, X_test), axis=0)
 y = numpy.concatenate((y_train, y_test), axis=0)
 
-#summarize size
+# Summarize the size of Training data (before split)
 print("Training data: ")
 print(X.shape)
 print(y.shape)
@@ -21,9 +22,12 @@ print("Number of words: ")
 print(len(numpy.unique(numpy.hstack(X))))
 
 # Summarize review lengths
-print("Review length: ")
+print("Average review length: ")
 result = [len(x) for x in X]
-print("Mean %.2f words (%f)" % (numpy.mean(result), numpy.std(result)))
-# plot review length
+print(numpy.mean(result))
+print("Standard deviation: ")
+print(numpy.std(result))
+
+# Plot review lengths
 pyplot.boxplot(result)
 pyplot.show()
