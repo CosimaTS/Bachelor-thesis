@@ -22,8 +22,8 @@ print("Loading data set ...")
 (X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
 print("Data set loaded!")
 
-X = numpy.concatenate((X_train, X_test), axis=0)#[0:1000] 
-y = numpy.concatenate((y_train, y_test), axis=0)#[0:1000]
+X = numpy.concatenate((X_train, X_test), axis=0)
+y = numpy.concatenate((y_train, y_test), axis=0)
 
 # Split the data set: 60% Training, 20% Validation, 20% Testing 
 X_train, X_test, y_train, y_test = train_test_split(X, y, 
@@ -49,17 +49,18 @@ X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
 print("Data padded!")
 
 ##### MODEL #####
-# Create the model
 embedding_vector_length = 32 #output dimension (size of the vector space in which words will be embedded)
 
 def create_model(dropout_rate=0.0):
+    # Create the model
     model = Sequential()
     model.add(Embedding(top_words, embedding_vector_length, input_length=max_review_length))
     model.add(Dropout(dropout_rate)) 
     model.add(LSTM(120)) 
     model.add(Dropout(dropout_rate))
     model.add(Dense(1, activation="sigmoid"))
-    model.compile(loss="binary_crossentropy", optimizer="Adam", metrics=["accuracy"])
+    optimizer = "Adam"
+    model.compile(loss="binary_crossentropy", optimizer=optimizer, metrics=["accuracy"])
     print(model.summary())
     return model
     
@@ -77,6 +78,7 @@ print(grid_result.best_params_["dropout_rate"])
 print(grid_result.best_params_["batch_size"])
 print(grid_result.best_params_["epochs"])
 
+# Fit the model
 model.fit(X_train, y_train, 
           epochs=grid_result.best_params_["epochs"], 
           batch_size=grid_result.best_params_["batch_size"],
