@@ -7,8 +7,9 @@ from keras.layers import LSTM
 from keras.layers import Dropout
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import brier_score_loss, roc_auc_score
+from sklearn.model_selection import train_test_split, GridSearchCV
+from keras.wrappers.scikit_learn import KerasClassifier 
+from sklearn.metrics import brier_score_loss, roc_auc_score, accuracy_score
 
 # Random seed for reproducibility
 seed = 7
@@ -50,35 +51,44 @@ print("Data padded!")
 ##### MODEL #####
 # Create the model
 embedding_vector_length = 32 #output dimension (size of the vector space in which words will be embedded)
-epochs = 3
-batch_size = 128
-dropout_rate = 0.2
-model = Sequential()
-model.add(Embedding(top_words, embedding_vector_length, input_length=max_review_length))
-model.add(Dropout(dropout_rate)) 
-model.add(LSTM(120))
-model.add(Dense(250, activation='relu'))
-model.add(Dropout(dropout_rate))
-model.add(Dense(1, activation="sigmoid"))
 
-# Compile the model
-optimizer = "Adam"
-model.compile(loss="binary_crossentropy", optimizer=optimizer, metrics=["accuracy"])
-print(model.summary()) #prints a summary of the layers
+def create_model(dropout_rate=0.0):
+    model = Sequential()
+    model.add(Embedding(top_words, embedding_vector_length, input_length=max_review_length))
+    model.add(Dropout(dropout_rate)) 
+    model.add(LSTM(120)) 
+    model.add(Dropout(dropout_rate))
+    model.add(Dense(1, activation="sigmoid"))
+    model.compile(loss="binary_crossentropy", optimizer="Adam", metrics=["accuracy"])
+    print(model.summary())
+    return model
+    
+# 3-fold Cross-Validation
+model = KerasClassifier(build_fn=create_model, verbose=0)
+dropout_rate = [0.1, 0.2]
+batch_size = [128, 256]
+epochs = [2, 3]
+param_grid = dict(dropout_rate=dropout_rate, batch_size=batch_size, epochs=epochs)
+grid = GridSearchCV(estimator=model, param_grid = param_grid)
+grid_result = grid.fit(X_train, y_train)
+print(grid)
+print(grid_result.best_score_)  
+print(grid_result.best_params_["dropout_rate"])
+print(grid_result.best_params_["batch_size"])
+print(grid_result.best_params_["epochs"])
 
-# Fit the model
 model.fit(X_train, y_train, 
-          epochs=epochs, 
-          batch_size=batch_size,
-          verbose=2,
+          epochs=grid_result.best_params_["epochs"], 
+          batch_size=grid_result.best_params_["batch_size"],
           validation_data=(X_val, y_val))
      
 ##### EVALUATION #####    
 # Evaluation of the model
-predictions = model.predict_proba(X_test)[:,0]
+predictions = model.predict_proba(X_test)[:,1]
+predictions_label = model.predict(X_test)
 lstm_brierscore = brier_score_loss(y_test, predictions)
 lstm_rocauc = roc_auc_score(y_test, predictions)
-lstm_accuracy = predictions[1]
+lstm_accuracy = accuracy_score(y_test, predictions_label)
 
 print("Accuracy: ")
 print(lstm_accuracy)
