@@ -16,13 +16,13 @@ numpy.random.seed(seed)
 
 ##### DATA SET #####
 # Load the data set 
-top_words = 5000 #input dimension for embedding layer (size of vocabulary)
+top_words = 5000 #input dimension for embedding layer 
 print("Loading data set ...")
 (X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
 print("Data set loaded!")
 
-X = numpy.concatenate((X_train, X_test), axis=0)#[0:1000] 
-y = numpy.concatenate((y_train, y_test), axis=0)#[0:1000]
+X = numpy.concatenate((X_train, X_test), axis=0)
+y = numpy.concatenate((y_train, y_test), axis=0)
 
 # Split the data set: 60% Training, 20% Validation, 20% Testing 
 X_train, X_test, y_train, y_test = train_test_split(X, y, 
@@ -41,7 +41,7 @@ print("Size of Testing data: ")
 print(X_test.shape)
     
 # Truncate and pad input sequences
-max_review_length = 350 #input length for embedding layer (length of input sequences)
+max_review_length = 350 #input length for embedding layer 
 X_train = sequence.pad_sequences(X_train, maxlen=max_review_length)
 X_val = sequence.pad_sequences(X_val, maxlen=max_review_length)
 X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
