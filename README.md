@@ -7,10 +7,10 @@ Code for the experimental setup of the thesis:
 - the Deep Learning algorithm: LSTM.
 
 The following LSTM codes are uploaded:
--	LSTM1: 	LSTM with default parameters,
--	LSTM2: 	LSTM with tuned parameters, 
+-	LSTM1: 	LSTM with default parameters and dropout,
+-	LSTM2: 	LSTM with the best tuned parameters and no dropout, 
 -	LSTM2a:	LSTM with a tuned dropout rate &
--	LSTM2b: LSTM with two hidden (dense) layers.
+-	LSTM2b:	LSTM with two hidden (dense) layers and dropout.
 
 Sources: 
 
