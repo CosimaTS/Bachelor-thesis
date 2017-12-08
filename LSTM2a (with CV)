@@ -19,7 +19,7 @@ numpy.random.seed(seed)
 
 ##### DATA SET #####
 # Load the data set 
-top_words = 5000 #input dimension for embedding layer (size of vocabulary)
+top_words = 5000 #input dimension for embedding layer 
 print("Loading data set ...")
 (X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
 print("Data set loaded!")
