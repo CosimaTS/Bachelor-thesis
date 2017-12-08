@@ -20,10 +20,10 @@ def tfidf(X_train, X_test):
 def log_reg_clf(X_train, y_train, X_test, y_test):
     Cs = numpy.array([0.1, 1.0, 5.0, 10.0])
     start = time()
-    logreg = LogisticRegression() #C parameter: regularization (prevents overfitting)
+    logreg = LogisticRegression() 
     
-    #Parameter tuning: 3-fold cross-validation (cv=none)
-    grid = GridSearchCV(estimator=logreg, param_grid=dict(C=Cs))
+    # Parameter tuning: 3-fold Cross-Validation 
+    grid = GridSearchCV(estimator = logreg, param_grid = dict(C = Cs))
     grid.fit(X_train, y_train)
     print(grid)
     print(grid.best_score_) #66% von 80% trainiert, 33% von 80% validiert 
@@ -31,7 +31,7 @@ def log_reg_clf(X_train, y_train, X_test, y_test):
     
     # Train and test the model
     print("Training ...")
-    logreg = LogisticRegression(C=grid.best_estimator_.C) #80% trainiert, 20% trainiert
+    logreg = LogisticRegression(C = grid.best_estimator_.C) 
     logreg.fit(X_train, y_train)
     print("Training done!")
 
@@ -50,17 +50,14 @@ print("Loading data set ...")
 (X_train, y_train), (X_test, y_test) = imdb.load_data()
 print("Data set loaded!")
 
-X = numpy.concatenate((X_train, X_test), axis=0)
-y = numpy.concatenate((y_train, y_test), axis=0)
+X = numpy.concatenate((X_train, X_test), axis = 0)
+y = numpy.concatenate((y_train, y_test), axis = 0)
 
-# Split data set: 60% Training, 20% Validation, 20% Testing 
+# Split data set 
 X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                    test_size=0.2, 
-                                                    random_state=1)
+                                                    test_size = 0.2, 
+                                                    random_state = 1)
 
-#X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, 
-                                                   #test_size=0.25, 
-                                                   #random_state=1)
 print("Size of Training data: ")
 print(X_train.shape)
 print("Size of Testing data: ")
