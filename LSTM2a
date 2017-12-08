@@ -43,7 +43,7 @@ print("Size of Testing data: ")
 print(X_test.shape)
     
 # Truncate and pad input sequences
-max_review_length = 500 #input length for embedding layer (length of input sequences)
+max_review_length = 500 #input length for embedding layer 
 X_train = sequence.pad_sequences(X_train, maxlen=max_review_length)
 X_val = sequence.pad_sequences(X_val, maxlen=max_review_length)
 X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
