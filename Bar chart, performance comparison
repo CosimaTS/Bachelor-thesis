@@ -8,24 +8,24 @@ import numpy as np
 fig, ax = plt.subplots()
 
 # Arrange the bars and axes
-models = ('Log. Reg.', 'LSTM1', 'LSTM2', 'LSTM2a', 'LSTM2b')
+models = (“Log. Reg.”, “LSTM1”, “LSTM2”, “LSTM2a”, “LSTM2b”)
 accuracy = [90.19, 97.53, 98.81, 93.60, 98.10]
 y_pos = np.arange(len(models))
-colors = ['#000000', '#dbb243', '#2e42d3', '#e54fe3', '#f23434']
+colors = [“#000000”, “#dbb243”, “#2e42d3”, “#e54fe3”, “#f23434”]
 
 # Axis labeling
-plt.ylabel('Accuracy in %')
+plt.ylabel(“Accuracy in %”)
 plt.xlabel("ML / DL Architectures")
 
 # Plot the bar chart
-plt.bar(y_pos, accuracy, align='center', alpha=0.6, color=colors)
+plt.bar(y_pos, accuracy, align = "center", alpha = 0.6, color = colors)
 
 # Set the names of the x-axis
 ax.set_xticks(range(len(models)))
-ax.set_xticklabels(models, rotation='vertical')
+ax.set_xticklabels(models, rotation = "vertical")
 
 # Show bar chart
 plt.show()
 
 # Save bar chart as an image
-plt.savefig('Performance comparison.png')
+plt.savefig("Performance comparison.png")
