@@ -24,17 +24,17 @@ print("Loading data set ...")
 (X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=top_words)
 print("Data set loaded!")
 
-X = numpy.concatenate((X_train, X_test), axis=0)
-y = numpy.concatenate((y_train, y_test), axis=0)
+X = numpy.concatenate((X_train, X_test), axis = 0)
+y = numpy.concatenate((y_train, y_test), axis = 0)
 
 # Split the data set: 60% Training, 20% Validation, 20% Testing 
 X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                    test_size=0.2, 
-                                                    random_state=1)
-
+                                                    test_size = 0.2, 
+                                                    random_state = 1)
+ 
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, 
-                                                   test_size=0.25, 
-                                                   random_state=1)
+                                                   test_size = 0.25, 
+                                                   random_state = 1)
 
 print("Size of Training data: ")
 print(X_train.shape)
@@ -45,34 +45,35 @@ print(X_test.shape)
     
 # Truncate and pad input sequences
 max_review_length = 500 
-X_train = sequence.pad_sequences(X_train, maxlen=max_review_length)
-X_val = sequence.pad_sequences(X_val, maxlen=max_review_length)
-X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
+X_train = sequence.pad_sequences(X_train, maxlen = max_review_length)
+X_val = sequence.pad_sequences(X_val, maxlen = max_review_length)
+X_test = sequence.pad_sequences(X_test, maxlen = max_review_length)
 print("Data padded!")
 
 ##### MODEL #####
 embedding_vector_length = 32 #output dimension 
+lstm_units = 80
 
 def create_model(dropout_rate=0.0):
     # Create the model
     model = Sequential()
-    model.add(Embedding(top_words, embedding_vector_length, input_length=max_review_length))
+    model.add(Embedding(top_words, embedding_vector_length, input_length = max_review_length))
     model.add(Dropout(dropout_rate)) 
-    model.add(LSTM(120)) 
+    model.add(LSTM(lstm_units)) 
     model.add(Dropout(dropout_rate))
-    model.add(Dense(1, activation="sigmoid"))
+    model.add(Dense(1, activation = "sigmoid"))
     optimizer = "Adam"
-    model.compile(loss="binary_crossentropy", optimizer=optimizer, metrics=["accuracy"])
+    model.compile(loss = "binary_crossentropy", optimizer = optimizer, metrics = ["accuracy"])
     print(model.summary())
     return model
     
 # 3-fold Cross-Validation
-model = KerasClassifier(build_fn=create_model, verbose=0)
+model = KerasClassifier(build_fn = create_model, verbose = 0)
 dropout_rate = [0.1, 0.2, 0.3]
 batch_size = [64, 128, 256]
 epochs = [2, 3]
-param_grid = dict(dropout_rate=dropout_rate, batch_size=batch_size, epochs=epochs)
-grid = GridSearchCV(estimator=model, param_grid = param_grid)
+param_grid = dict(dropout_rate = dropout_rate, batch_size = batch_size, epochs = epochs)
+grid = GridSearchCV(estimator = model, param_grid = param_grid)
 grid_result = grid.fit(X_train, y_train)
 print(grid)
 print(grid_result.best_score_)  
@@ -82,9 +83,9 @@ print(grid_result.best_params_["epochs"])
 
 # Fit the model
 model.fit(X_train, y_train, 
-          epochs=grid_result.best_params_["epochs"], 
-          batch_size=grid_result.best_params_["batch_size"],
-          validation_data=(X_val, y_val))
+          epochs = grid_result.best_params_["epochs"], 
+          batch_size = grid_result.best_params_["batch_size"],
+          validation_data = (X_val, y_val))
      
 ##### EVALUATION #####    
 # Evaluation of the model
