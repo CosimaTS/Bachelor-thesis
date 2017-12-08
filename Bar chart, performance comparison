@@ -1,3 +1,5 @@
+#### CODE FOR BAR CHART, PERFORMANCE COMPARISON #### 
+
 # Import libraries
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,6 +24,8 @@ plt.bar(y_pos, accuracy, align='center', alpha=0.6, color=colors)
 ax.set_xticks(range(len(models)))
 ax.set_xticklabels(models, rotation='vertical')
 
+# Show bar chart
 plt.show()
 
+# Save bar chart as an image
 plt.savefig('Performance comparison.png')
