@@ -1,3 +1,5 @@
+#### Logistic Regression ####
+
 # Import necessary libraries
 import numpy
 from time import time
@@ -99,7 +101,7 @@ logreg_brierscore = model_fct[2]
 logreg_rocauc = model_fct[3]
 logreg_time = model_fct[4]
 
-print("Accuracy is: ")
+print("Accuracy: ")
 print(logreg_accuracy)
 print("Brier score: ")
 print(logreg_brierscore)
