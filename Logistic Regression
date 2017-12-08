@@ -62,7 +62,6 @@ print("Size of Training data: ")
 print(X_train.shape)
 print("Size of Testing data: ")
 print(X_test.shape)
-#print(X_val.shape)
 
 # Create an index
 print("Creating the index ...")
