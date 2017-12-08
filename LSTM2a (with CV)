@@ -68,8 +68,8 @@ def create_model(dropout_rate=0.0):
     
 # 3-fold Cross-Validation
 model = KerasClassifier(build_fn=create_model, verbose=0)
-dropout_rate = [0.1, 0.2]
-batch_size = [128, 256]
+dropout_rate = [0.1, 0.2, 0.3]
+batch_size = [64, 128, 256]
 epochs = [2, 3]
 param_grid = dict(dropout_rate=dropout_rate, batch_size=batch_size, epochs=epochs)
 grid = GridSearchCV(estimator=model, param_grid = param_grid)
