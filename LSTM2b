@@ -54,7 +54,7 @@ print("Data padded!")
 embedding_vector_length = 32 #output dimension 
 epochs = 3
 batch_size = 256
-dropout_rate = 0.2
+dropout_rate = 0.1
 lstm_units = 80 
 
 model = Sequential()
