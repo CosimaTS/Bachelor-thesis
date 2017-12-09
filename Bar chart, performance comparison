@@ -9,7 +9,7 @@ fig, ax = plt.subplots()
 
 # Arrange the bars and axes
 models = (“Log. Reg.”, “LSTM1”, “LSTM2”, “LSTM2a”, “LSTM2b”)
-accuracy = [90.19, 97.53, 98.81, 93.60, 98.10]
+accuracy = [90.19, 97.53, 98.81, 98.17, 97.70]
 y_pos = np.arange(len(models))
 colors = [“#000000”, “#dbb243”, “#2e42d3”, “#e54fe3”, “#f23434”]
 
