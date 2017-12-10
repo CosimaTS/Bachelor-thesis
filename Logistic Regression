@@ -38,7 +38,6 @@ def log_reg_clf(X_train, y_train, X_test, y_test):
     print("Testing ...")
     logreg_accuracy = logreg.score(X_test, y_test) * 100
     predictions = logreg.predict_proba(X_test)[:,1]
-    print(predictions)
     logreg_brierscore = brier_score_loss(y_test, predictions)
     logreg_rocauc = roc_auc_score(y_test, predictions)
     print("Testing done!")
@@ -73,7 +72,7 @@ print("Index done!")
 
 # Reconstruct reviews: using the above built index
 X_train = [
-    ' '.join(
+    " ".join(
         index_to_word[i]
         for i in X_train[i]
         if i < len(index_to_word)
@@ -81,7 +80,7 @@ X_train = [
 ]
 
 X_test = [
-    ' '.join(
+    " ".join(
         index_to_word[i]
         for i in X_test[i]
         if i < len(index_to_word)
